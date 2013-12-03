@@ -14,6 +14,11 @@
         margin: 50px;
       }
 
+      input#advance {
+        text-align: right;
+        width: 50px;
+      }
+
       div#photos {
         display: none;
       }
@@ -30,6 +35,11 @@
           <option value="upscale">Fit to Screen</option>
           <option value="downscale">Fit to Screen (large images only)</option>
         </select>
+      </p>
+      <p>
+        Auto advance in seconds (0 to disable):
+
+        <input id="advance" type="text" value="0" />
       </p>
       <p>
         <button onclick="startSlideshow();">Start Slideshow</button>
@@ -62,6 +72,10 @@
         document.getElementById("photos").style.display = "block";
         scaling = document.getElementById("scaling").value;
         showImage();
+        var interval = parseFloat(document.getElementById("advance").value);
+        if (!isNaN(interval) && interval > 0) {
+          setInterval(nextImage, interval * 1000);
+        }
       }
 
       function nextImage() {
