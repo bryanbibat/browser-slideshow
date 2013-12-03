@@ -65,6 +65,8 @@
       var scaling = "none";
       var origWidth = null;
       var origHeight = null;
+      var interval = null;
+      var intervalId = null;
 
       function startSlideshow() {
         started = true;
@@ -72,9 +74,9 @@
         document.getElementById("photos").style.display = "block";
         scaling = document.getElementById("scaling").value;
         showImage();
-        var interval = parseFloat(document.getElementById("advance").value);
+        interval = parseFloat(document.getElementById("advance").value);
         if (!isNaN(interval) && interval > 0) {
-          setInterval(nextImage, interval * 1000);
+          intervalId = setInterval(nextImage, interval * 1000);
         }
       }
 
@@ -146,11 +148,21 @@
         photo.style.marginBottom = margin;
       }
 
-      Mousetrap.bind("up", previousImage);
-      Mousetrap.bind("left", previousImage);
-      Mousetrap.bind("down", nextImage);
-      Mousetrap.bind("right", nextImage);
-      Mousetrap.bind("space", nextImage);
+      function intervalReset(action) {
+        if (intervalId !== null) {
+          window.clearInterval(intervalId);
+        }
+        action();
+        if (intervalId !== null) {
+          intervalId = setInterval(nextImage, interval * 1000);
+        }
+      }
+
+      Mousetrap.bind("up", function () { intervalReset(previousImage) });
+      Mousetrap.bind("left", function () { intervalReset(previousImage) });
+      Mousetrap.bind("down", function () { intervalReset(nextImage) });
+      Mousetrap.bind("right", function () { intervalReset(nextImage) });
+      Mousetrap.bind("space", function () { intervalReset(nextImage) });
     </script>
   </body>
 </html>
