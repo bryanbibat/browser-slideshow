@@ -99,13 +99,17 @@
       }
 
       function showImage() {
-        var photosDiv = document.getElementById("photos");
-        photosDiv.innerHTML = "";
-        var photo = document.createElement("img");
+        var photo = document.getElementById("photo");
+        if (photo === null) {
+          var photosDiv = document.getElementById("photos");
+          photo = document.createElement("img");
+          photosDiv.appendChild(photo);
+        }
+        photo.removeAttribute("width");
+        photo.removeAttribute("height");
         photo.src = images[currentImage];
         photo.onload = resizeImage;
         photo.id = "photo";
-        photosDiv.appendChild(photo);
         origWidth = null;
         origHeight = null;
         window.onresize = resizeImage;
