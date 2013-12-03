@@ -107,6 +107,7 @@
         origWidth = null;
         origHeight = null;
         window.onresize = resizeImage;
+        document.title = "Browser Slideshow - " + (currentImage + 1) + "/" + images.length;
       }
 
       function resizeImage() {
