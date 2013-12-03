@@ -7,6 +7,7 @@
         background: black;
         font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
         color: white;
+        margin: 0;
       }
 
       div#settings  {
@@ -20,7 +21,16 @@
   </head>
   <body>
     <div id="settings">
-      <p>Settings Here</p>
+      <h2>Settings</h2>
+      <p>
+        Scaling:
+
+        <select id="scaling">
+          <option value="none">None</option>
+          <option value="upscale">Fit to Screen</option>
+          <option value="downscale">Fit to Screen (large images only)</option>
+        </select>
+      </p>
       <p>
         <button onclick="startSlideshow();">Start Slideshow</button>
       </p>
@@ -42,11 +52,15 @@
 
       var started = false;
       var currentImage = 0;
+      var scaling = "none";
+      var origWidth = null;
+      var origHeight = null;
 
       function startSlideshow() {
         started = true;
         document.getElementById("settings").style.display = "none";
         document.getElementById("photos").style.display = "block";
+        scaling = document.getElementById("scaling").value;
         showImage();
       }
 
@@ -73,7 +87,48 @@
         photosDiv.innerHTML = "";
         var photo = document.createElement("img");
         photo.src = images[currentImage];
+        photo.onload = resizeImage;
+        photo.id = "photo";
         photosDiv.appendChild(photo);
+        origWidth = null;
+        origHeight = null;
+        window.onresize = resizeImage;
+      }
+
+      function resizeImage() {
+        centerImage();
+        if (scaling !== "upscale" && scaling !== "downscale") return;
+        var photo = document.getElementById("photo");
+        if (origWidth === null && origHeight === null) {
+          origWidth = photo.width;
+          origHeight = photo.height;
+        }
+        var widthRatio = origWidth / window.innerWidth;
+        var heightRatio = origHeight / window.innerHeight;
+        
+        //console.log("wr: " + widthRatio + " hr: " + heightRatio);
+
+        // do nothing if downscale and image does not go beyond borders
+        if (widthRatio < 1 && heightRatio < 1 && scaling === "downscale") return;
+
+        if (scaling === "upscale" || widthRatio > 1 || heightRatio > 1) {
+          // image wider than window
+          if (widthRatio > heightRatio) {
+            photo.width = origWidth / widthRatio;
+            photo.height = origHeight / widthRatio;
+          } else {
+            photo.height = origHeight / heightRatio;
+            photo.width = origWidth / heightRatio;
+          }
+        }
+        centerImage();
+      }
+
+      function centerImage() {
+        var photo = document.getElementById("photo");
+        var margin = ((window.innerHeight - photo.height) / 2) + "px";
+        photo.style.marginTop = margin;
+        photo.style.marginBottom = margin;
       }
 
       Mousetrap.bind("up", previousImage);
